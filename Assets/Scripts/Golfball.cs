@@ -12,6 +12,7 @@ public class Golfball : MonoBehaviour
     [SerializeField] private Activity activity = Activity.idle;
 
     [Header("Launch")]
+    [SerializeField] private Arrow arrow;
     [SerializeField] private float launchMultiplier = 1f;
     private float stopVelocity = .01f;
 
@@ -19,14 +20,14 @@ public class Golfball : MonoBehaviour
     {
         col = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
+
+        arrow.gameObject.SetActive(false);
     }
 
     void Update()
     {
         CheckMousePosition();
         CheckVelocity();
-
-        Debug.Log(rb.velocity);
     }
 
     private void OnCollisionStay(Collision collision)
@@ -80,19 +81,16 @@ public class Golfball : MonoBehaviour
             return;
         }
 
-        // Show aiming.
+        // Shows aiming trajectory with LineRenderer. 
+        arrow.gameObject.SetActive(true);
+        Vector3 launchDirection = CalculateLaunchVector();
+        arrow.SetArrow(transform.position, launchDirection, launchDirection.magnitude * .5f);
     }
 
     private void LaunchBall()
     {
-        // Get mouse position and find the direction away from the ball.
-        Vector3 mousePos = Input.mousePosition;
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-        worldPos.z = 0f;
-
-        // Direction should be opposite of the mouse.
-        Vector3 direction = worldPos - transform.position;
-        Vector3 launchDirection = -direction;
+        Vector3 launchDirection = CalculateLaunchVector();
+        arrow.gameObject.SetActive(false);
 
         // Ensure the mouse is far enough off the ball to launch.
         if (launchDirection.magnitude < 1f)
@@ -116,5 +114,19 @@ public class Golfball : MonoBehaviour
             activity = Activity.idle;
             rb.velocity = Vector3.zero;
         }
+    }
+
+    private Vector3 CalculateLaunchVector()
+    {
+        // Get mouse position and find the direction away from the ball.
+        Vector3 mousePos = Input.mousePosition;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+        worldPos.z = 0f;
+
+        // Direction should be opposite of the mouse.
+        Vector3 direction = worldPos - transform.position;
+        Vector3 launchDirection = -direction;
+
+        return launchDirection;
     }
 }
