@@ -120,8 +120,8 @@ public class Golfball : MonoBehaviour
     {
         // Get mouse position and find the direction away from the ball.
         Vector3 mousePos = Input.mousePosition;
+        mousePos.z = -Camera.main.transform.position.z;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-        worldPos.z = 0f;
 
         // Direction should be opposite of the mouse.
         Vector3 direction = worldPos - transform.position;
