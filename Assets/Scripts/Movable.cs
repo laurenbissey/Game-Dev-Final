@@ -57,24 +57,34 @@ public class Movable : MonoBehaviour
 
     private void PreventCollision()
     {
-        // Finds all overlapping colliders.
-        Collider[] overlapping = Physics.OverlapSphere(transform.position, radius);
+        const int iterationCount = 10;
 
-        // For each overlapping collider, move the object to the closest non-collision.
-        foreach (Collider overlap in overlapping)
+        for (int i = 0; i < iterationCount; i++)
         {
-            if (overlap == col || overlap.isTrigger) continue;
+            bool isSeparated = true;
 
-            Vector3 directionToMove = Vector3.zero;
-            float distanceToMove = 0f;
+            // Finds all overlapping colliders.
+            Collider[] overlapping = Physics.OverlapSphere(transform.position, radius);
 
-            // Calculates the distance to the outside of the collider.
-            if (Physics.ComputePenetration(col, transform.position, transform.rotation,
-                                           overlap, overlap.transform.position, overlap.transform.rotation,
-                                           out directionToMove, out distanceToMove))
+            // For each overlapping collider, move the object to the closest non-collision.
+            foreach (Collider overlap in overlapping)
             {
-                transform.position += directionToMove * distanceToMove;
+                if (overlap == col || overlap.isTrigger) continue;
+
+                Vector3 directionToMove = Vector3.zero;
+                float distanceToMove = 0f;
+
+                // Calculates the distance to the outside of the collider.
+                if (Physics.ComputePenetration(col, transform.position, transform.rotation,
+                                               overlap, overlap.transform.position, overlap.transform.rotation,
+                                               out directionToMove, out distanceToMove))
+                {
+                    transform.position += directionToMove * distanceToMove;
+                    isSeparated = false;
+                }
             }
+
+            if (isSeparated) break;
         }
     }
 
