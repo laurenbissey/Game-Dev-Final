@@ -24,12 +24,19 @@ public class CameraFollow : MonoBehaviour
     public bool onlyMoveRight = false;
 
     private Camera cam;
+    private float initialZoom;
     private float initialZ;
 
     void Awake()
     {
         cam = GetComponent<Camera>();
+        initialZoom = cam.orthographicSize;
         initialZ = transform.position.z;
+    }
+
+    private void OnEnable()
+    {
+        cam.orthographicSize = initialZoom;
     }
 
     void LateUpdate()

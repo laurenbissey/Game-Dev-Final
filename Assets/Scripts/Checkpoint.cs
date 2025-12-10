@@ -5,6 +5,9 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class Checkpoint : MonoBehaviour
 {
+    private BallManager cachedBallManager;
+    private Golfball cachedBall;
+
     [Header("Visuals (optional)")]
     [SerializeField] private Renderer flagRenderer;
     [SerializeField] private Color inactiveColor = Color.white;
@@ -27,15 +30,37 @@ public class Checkpoint : MonoBehaviour
         }
     }
 
+    // Caches Golfball and BallManager scripts to prevent calling GetComponent each frame.
     private void OnTriggerEnter(Collider other)
     {
         if (other.attachedRigidbody == null) return;
 
-        BallManager ball = other.attachedRigidbody.GetComponent<BallManager>();
-        if (ball == null) return;
+        cachedBallManager = other.attachedRigidbody.GetComponent<BallManager>();
+        cachedBall = other.attachedRigidbody.GetComponent<Golfball>();
+    }
 
-        ball.SetCheckpoint(transform.position);
-        ActivateVisual();
+    private void OnTriggerExit(Collider other)
+    {
+        if (cachedBall == null || cachedBallManager == null) return;
+
+        if (other.attachedRigidbody.GetComponent<BallManager>() == cachedBallManager)
+        {
+            cachedBallManager = null;
+            cachedBall = null;
+        }
+    }
+
+    // Checks for the ball to become idle, preventing it from falling off
+    // and gaining a checkpoint.
+    private void OnTriggerStay(Collider other)
+    {
+        if (cachedBall == null || cachedBallManager == null) return;
+
+        if (cachedBall.activity == Golfball.BallActivity.idle)
+        {
+            cachedBallManager.SetCheckpoint(transform.position);
+            ActivateVisual();
+        }
     }
 
     private void ActivateVisual()

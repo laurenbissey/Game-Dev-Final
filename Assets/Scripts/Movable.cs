@@ -11,6 +11,7 @@ public class Movable : MonoBehaviour
     [Header("Status")]
     [SerializeField] private Activity activity = Activity.movable;
     private Vector3 offset = Vector3.zero;
+    private Vector3 previousPos;
 
     [Header("Object")]
     [SerializeField] private float radius = 2.0f;
@@ -18,6 +19,8 @@ public class Movable : MonoBehaviour
     void Start()
     {
         col = GetComponent<Collider>();
+
+        previousPos = transform.position;
     }
 
     void Update()
@@ -31,7 +34,16 @@ public class Movable : MonoBehaviour
         if (activity != Activity.moving) return;
         
         // If the mouse has been released, stop moving.
-        if (Input.GetMouseButtonUp(0)) { activity = Activity.movable; return; }
+        if (Input.GetMouseButtonUp(0)) {
+            // Prevent objects from being placed on each other on the Z-axis.
+            if (previousPos.z != transform.position.z)
+                transform.position = previousPos;
+            else
+                previousPos = transform.position;
+
+            activity = Activity.movable; 
+            return;
+        }
 
         // Find the mouse position and keep the correct offset.
         Vector3 mousePos = Input.mousePosition;
@@ -51,9 +63,7 @@ public class Movable : MonoBehaviour
         // For each overlapping collider, move the object to the closest non-collision.
         foreach (Collider overlap in overlapping)
         {
-            if (overlap == col) continue;
-
-            Debug.Log(overlap);
+            if (overlap == col || overlap.isTrigger) continue;
 
             Vector3 directionToMove = Vector3.zero;
             float distanceToMove = 0f;
@@ -88,5 +98,6 @@ public class Movable : MonoBehaviour
     public void Lock()
     {
         activity = Activity.locked;
+        this.enabled = false;
     }
 }

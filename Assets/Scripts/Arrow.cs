@@ -6,7 +6,7 @@ public class Arrow : MonoBehaviour
     private LineRenderer lineRenderer;
     [SerializeField] private GameObject arrowHead;
 
-    void Start()
+    void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
     }

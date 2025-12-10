@@ -33,4 +33,17 @@ public class MoveBlocks : MonoBehaviour
             movingBlock = false;
         }
     }
+
+    public void LockBlocks()
+    {
+        // Finds all Movable objects and locks them (preventing movement).
+        GameObject[] movables = GameObject.FindGameObjectsWithTag("Movable");
+
+        foreach (GameObject movable in movables)
+        {
+            movable.GetComponent<Movable>().Lock();
+        }
+
+        movingBlock = false;
+    }
 }

@@ -6,15 +6,19 @@ public class Golfball : MonoBehaviour
     private Collider col;
     private Rigidbody rb;
 
-    private enum Activity { idle, active, aiming };
+    public enum BallActivity { idle, active, aiming };
     [Header("Status")]
     [Tooltip("Idle: Standstill, Active: Moving, Aiming: Standstill + MouseDown")]
-    [SerializeField] private Activity activity = Activity.idle;
+    public BallActivity activity = BallActivity.idle;
 
     [Header("Launch")]
     [SerializeField] private Arrow arrow;
     [SerializeField] private float launchMultiplier = 1f;
     private float stopVelocity = .01f;
+
+    [Tooltip("Gives time for the ball to accumulate velocity from idle.")]
+    private float stopDelay = 0f;
+    private float maxStopDelay = .1f;
 
     void Start()
     {
@@ -48,10 +52,10 @@ public class Golfball : MonoBehaviour
     {
         switch (activity)
         {
-            case Activity.idle:
+            case BallActivity.idle:
                 MouseOnBall();
                 break;
-            case Activity.aiming:
+            case BallActivity.aiming:
                 MouseAimingBall();
                 break;
         }
@@ -68,7 +72,7 @@ public class Golfball : MonoBehaviour
         // Raycast towards the screen from the mouse, checking for the Golf Ball collider.
         if (col.Raycast(ray, out hit, Mathf.Infinity))
         {
-            activity = Activity.aiming;
+            activity = BallActivity.aiming;
         }
     }
 
@@ -95,23 +99,26 @@ public class Golfball : MonoBehaviour
         // Ensure the mouse is far enough off the ball to launch.
         if (launchDirection.magnitude < 1f)
         {
-            activity = Activity.idle;
+            activity = BallActivity.idle;
             return;
         }
 
         rb.AddForce(launchDirection * launchMultiplier, ForceMode.Impulse);
 
-        activity = Activity.active;
+        stopDelay = 0;
+        activity = BallActivity.active;
     }
 
     private void CheckVelocity()
     {
-        if (activity != Activity.active) return;
+        if (activity != BallActivity.active) return;
+
+        stopDelay += Time.deltaTime;
 
         // If the ball has stopped moving, changed mode.
-        if (rb.velocity.magnitude <= stopVelocity)
+        if (rb.velocity.magnitude <= stopVelocity && stopDelay >= maxStopDelay)
         {
-            activity = Activity.idle;
+            activity = BallActivity.idle;
             rb.velocity = Vector3.zero;
         }
     }
