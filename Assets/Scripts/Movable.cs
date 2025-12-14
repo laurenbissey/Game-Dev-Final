@@ -64,7 +64,7 @@ public class Movable : MonoBehaviour
             bool isSeparated = true;
 
             // Finds all overlapping colliders.
-            Collider[] overlapping = Physics.OverlapSphere(transform.position, radius);
+            Collider[] overlapping = Physics.OverlapSphere(transform.position, radius, ~0, QueryTriggerInteraction.Ignore);
 
             // For each overlapping collider, move the object to the closest non-collision.
             foreach (Collider overlap in overlapping)
