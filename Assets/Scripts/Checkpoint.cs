@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Collider2D))]
 public class Checkpoint : MonoBehaviour
 {
     private BallManager cachedBallManager;
     private Golfball cachedBall;
 
     [Header("Visuals (optional)")]
-    [SerializeField] private Renderer flagRenderer;
+    [SerializeField] private SpriteRenderer flagRenderer;
     [SerializeField] private Color inactiveColor = Color.white;
     [SerializeField] private Color activeColor = Color.green;
 
@@ -17,7 +17,7 @@ public class Checkpoint : MonoBehaviour
 
     private void Reset()
     {
-        Collider col = GetComponent<Collider>();
+        Collider2D col = GetComponent<Collider2D>();
         col.isTrigger = true;
     }
 
@@ -25,13 +25,12 @@ public class Checkpoint : MonoBehaviour
     {
         if (flagRenderer != null)
         {
-            var mat = flagRenderer.material;
-            mat.color = inactiveColor;
+            flagRenderer.color = inactiveColor;
         }
     }
 
     // Caches Golfball and BallManager scripts to prevent calling GetComponent each frame.
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.attachedRigidbody == null) return;
 
@@ -39,7 +38,7 @@ public class Checkpoint : MonoBehaviour
         cachedBall = other.attachedRigidbody.GetComponent<Golfball>();
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OnTriggerExit2D(Collider2D other)
     {
         if (cachedBall == null || cachedBallManager == null) return;
 
@@ -52,7 +51,7 @@ public class Checkpoint : MonoBehaviour
 
     // Checks for the ball to become idle, preventing it from falling off
     // and gaining a checkpoint.
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (cachedBall == null || cachedBallManager == null) return;
 
@@ -70,8 +69,7 @@ public class Checkpoint : MonoBehaviour
 
         if (flagRenderer != null)
         {
-            var mat = flagRenderer.material;
-            mat.color = activeColor;
+            flagRenderer.color = activeColor;
         }
     }
 }

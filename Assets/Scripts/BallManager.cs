@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class BallManager : MonoBehaviour
 {
     public static BallManager Instance { get; private set; }
 
     [Header("References")]
-    [SerializeField] private Rigidbody rb;
+    [SerializeField] private Rigidbody2D rb;
 
     [SerializeField] private MonoBehaviour shotController;
 
@@ -34,7 +34,7 @@ public class BallManager : MonoBehaviour
         Instance = this;
 
         if (rb == null)
-            rb = GetComponent<Rigidbody>();
+            rb = GetComponent<Rigidbody2D>();
     }
 
     private void Start()
@@ -61,8 +61,8 @@ public class BallManager : MonoBehaviour
     /// Move ball back to checkpoint and stop its movement
     public void Respawn()
     {
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0;
         transform.position = currentCheckpoint;
 
         onRespawn?.Invoke();
@@ -71,8 +71,8 @@ public class BallManager : MonoBehaviour
     /// Called by the FinishZone when the level is completed
     public void LevelComplete()
     {
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0;
 
         if (shotController != null)
             shotController.enabled = false;

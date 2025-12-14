@@ -2,25 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class Movable : MonoBehaviour
 {
     [Header("Components")]
-    private Collider col;
+    private Collider2D col;
+    private Rigidbody2D rb;
 
     private enum Activity { movable, moving, locked };
     [Header("Status")]
     [SerializeField] private Activity activity = Activity.movable;
-    private Vector3 offset = Vector3.zero;
-    private Vector3 previousPos;
-
-    [Header("Object")]
-    [SerializeField] private float radius = 2.0f;
+    private Vector2 offset = Vector2.zero;
+    private Vector2 previousPos = Vector2.zero;
+    private bool isSeparated = true;
 
     void Start()
     {
-        col = GetComponent<Collider>();
-
-        previousPos = transform.position;
+        col = GetComponent<Collider2D>();
+        rb = GetComponent<Rigidbody2D>();
+        rb.isKinematic = true;
+        previousPos = rb.position;
     }
 
     void Update()
@@ -30,56 +32,78 @@ public class Movable : MonoBehaviour
 
     private void Move()
     {
-        // StartMoving() called before
         if (activity != Activity.moving) return;
-        
-        // If the mouse has been released, stop moving.
-        if (Input.GetMouseButtonUp(0)) {
-            // Prevent objects from being placed on each other on the Z-axis.
-            if (previousPos.z != transform.position.z)
-                transform.position = previousPos;
-            else
-                previousPos = transform.position;
 
-            activity = Activity.movable; 
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (!isSeparated)
+            {
+                rb.position = previousPos;
+            }
+            else
+            {
+                previousPos = rb.position;
+            }
+
+            activity = Activity.movable;
             return;
         }
 
-        // Find the mouse position and keep the correct offset.
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = -Camera.main.transform.position.z;
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-
-        transform.position = worldPos - offset;
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        rb.position = worldPos - offset;
 
         PreventCollision();
+
+        if (isSeparated)
+        {
+            previousPos = rb.position;
+        }
+        else
+        {
+            rb.position = previousPos;
+        }
     }
 
     private void PreventCollision()
     {
         const int iterationCount = 10;
+        Collider2D[] overlapping = new Collider2D[16];
+        ContactFilter2D filter = new ContactFilter2D().NoFilter();
+
+        int contactCount = rb.OverlapCollider(filter, overlapping);
+
+        if (contactCount == 0)
+        {
+            isSeparated = true;
+            return;
+        }
 
         for (int i = 0; i < iterationCount; i++)
         {
-            bool isSeparated = true;
+            isSeparated = true;
 
-            // Finds all overlapping colliders.
-            Collider[] overlapping = Physics.OverlapSphere(transform.position, radius, ~0, QueryTriggerInteraction.Ignore);
+            contactCount = rb.OverlapCollider(filter, overlapping);
+            if (contactCount == 0) break;
 
-            // For each overlapping collider, move the object to the closest non-collision.
-            foreach (Collider overlap in overlapping)
+            for (int j = 0; j < contactCount; j++)
             {
-                if (overlap == col || overlap.isTrigger) continue;
+                Collider2D overlap = overlapping[j];
 
-                Vector3 directionToMove = Vector3.zero;
-                float distanceToMove = 0f;
+                if (overlap.isTrigger || overlap == col) continue;
 
-                // Calculates the distance to the outside of the collider.
-                if (Physics.ComputePenetration(col, transform.position, transform.rotation,
-                                               overlap, overlap.transform.position, overlap.transform.rotation,
-                                               out directionToMove, out distanceToMove))
+                if (overlap.CompareTag("Blocking"))
                 {
-                    transform.position += directionToMove * distanceToMove;
+                    isSeparated = false;
+                    activity = Activity.movable;
+                    return;
+                }
+
+                ColliderDistance2D colliderDistance = Physics2D.Distance(col, overlap);
+
+                if (colliderDistance.isOverlapped)
+                {
+                    Vector2 separation = colliderDistance.normal * colliderDistance.distance;
+                    rb.position += separation;
                     isSeparated = false;
                 }
             }
@@ -90,17 +114,12 @@ public class Movable : MonoBehaviour
 
     public bool StartMoving()
     {
-        // Cannot move if locked.
         if (activity == Activity.locked) return false;
 
         activity = Activity.moving;
-
-        // Calculate the offset from the center of the object, to keep correct positioning while moving.
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = -Camera.main.transform.position.z;
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-
-        offset = worldPos - transform.position;
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        offset = worldPos - rb.position;
+        previousPos = rb.position;
 
         return true;
     }

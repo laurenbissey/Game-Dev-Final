@@ -16,10 +16,10 @@ public class MoveBlocks : MonoBehaviour
         // If clicked, check for an object with the "Movable" component.
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            if (hit.collider != null)
             {
                 Movable movable = hit.collider.GetComponent<Movable>();
 
@@ -29,7 +29,8 @@ public class MoveBlocks : MonoBehaviour
             }
         }
         // If click released, stop moving objects.
-        else if (Input.GetMouseButtonUp(0)) {
+        else if (Input.GetMouseButtonUp(0)) 
+        {
             movingBlock = false;
         }
     }

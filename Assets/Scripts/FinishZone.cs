@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Collider2D))]
 public class FinishZone : MonoBehaviour
 {
     private BallManager cachedBallManager;
@@ -14,12 +14,12 @@ public class FinishZone : MonoBehaviour
 
     private void Reset()
     {
-        Collider col = GetComponent<Collider>();
+        Collider2D col = GetComponent<Collider2D>();
         col.isTrigger = true;
     }
 
     // Caches Golfball and BallManager scripts to prevent calling GetComponent each frame.
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.attachedRigidbody == null) return;
 
@@ -27,7 +27,7 @@ public class FinishZone : MonoBehaviour
         cachedBall = other.attachedRigidbody.GetComponent<Golfball>();
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OnTriggerExit2D(Collider2D other)
     {
         if (cachedBall == null || cachedBallManager == null) return;
 
@@ -40,7 +40,7 @@ public class FinishZone : MonoBehaviour
 
     // Checks for the ball to become idle, preventing it from falling off
     // and completing the level.
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (cachedBall == null || cachedBallManager == null) return;
 

@@ -3,8 +3,8 @@ using UnityEngine;
 public class Golfball : MonoBehaviour
 {
     [Header("Components")]
-    private Collider col;
-    private Rigidbody rb;
+    private Collider2D col;
+    private Rigidbody2D rb;
 
     public enum BallActivity { idle, active, aiming };
     [Header("Status")]
@@ -22,8 +22,8 @@ public class Golfball : MonoBehaviour
 
     void Start()
     {
-        col = GetComponent<Collider>();
-        rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider2D>();
+        rb = GetComponent<Rigidbody2D>();
 
         arrow.gameObject.SetActive(false);
     }
@@ -34,7 +34,7 @@ public class Golfball : MonoBehaviour
         CheckVelocity();
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         // Checks that the object has collided with an object with GroundType
         GroundType groundType = collision.gameObject.GetComponent<GroundType>();
@@ -44,7 +44,7 @@ public class Golfball : MonoBehaviour
             // GroundType's friction multiplier is used to slow down the ball.
             float frictionForce = groundType.rollingFriction;
 
-            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, frictionForce * Time.deltaTime);
+            rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, frictionForce * Time.deltaTime);
         }
     }
 
@@ -66,11 +66,10 @@ public class Golfball : MonoBehaviour
         // Only check if the mouse has been clicked.
         if (!Input.GetMouseButtonDown(0)) return;
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
+        Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        // Raycast towards the screen from the mouse, checking for the Golf Ball collider.
-        if (col.Raycast(ray, out hit, Mathf.Infinity))
+        // Check if the mouse is on the ball's collider.
+        if (col.OverlapPoint(worldPoint))
         {
             activity = BallActivity.aiming;
         }
@@ -87,13 +86,13 @@ public class Golfball : MonoBehaviour
 
         // Shows aiming trajectory with LineRenderer. 
         arrow.gameObject.SetActive(true);
-        Vector3 launchDirection = CalculateLaunchVector();
+        Vector2 launchDirection = CalculateLaunchVector();
         arrow.SetArrow(transform.position, launchDirection, launchDirection.magnitude * .5f);
     }
 
     private void LaunchBall()
     {
-        Vector3 launchDirection = CalculateLaunchVector();
+        Vector2 launchDirection = CalculateLaunchVector();
         arrow.gameObject.SetActive(false);
 
         // Ensure the mouse is far enough off the ball to launch.
@@ -103,7 +102,7 @@ public class Golfball : MonoBehaviour
             return;
         }
 
-        rb.AddForce(launchDirection * launchMultiplier, ForceMode.Impulse);
+        rb.AddForce(launchDirection * launchMultiplier, ForceMode2D.Impulse);
 
         stopDelay = 0;
         activity = BallActivity.active;
@@ -119,20 +118,18 @@ public class Golfball : MonoBehaviour
         if (rb.velocity.magnitude <= stopVelocity && stopDelay >= maxStopDelay)
         {
             activity = BallActivity.idle;
-            rb.velocity = Vector3.zero;
+            rb.velocity = Vector2.zero;
         }
     }
 
-    private Vector3 CalculateLaunchVector()
+    private Vector2 CalculateLaunchVector()
     {
         // Get mouse position and find the direction away from the ball.
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = -Camera.main.transform.position.z;
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         // Direction should be opposite of the mouse.
-        Vector3 direction = worldPos - transform.position;
-        Vector3 launchDirection = -direction;
+        Vector2 direction = worldPos - (Vector2) transform.position;
+        Vector2 launchDirection = -direction;
 
         return launchDirection;
     }
