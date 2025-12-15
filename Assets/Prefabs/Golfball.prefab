@@ -250,7 +250,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activity: 0
   arrow: {fileID: 5106587614612667645}
-  launchMultiplier: 4
+  launchMultiplier: 5
 --- !u!114 &8364750106391343001
 MonoBehaviour:
   m_ObjectHideFlags: 0
