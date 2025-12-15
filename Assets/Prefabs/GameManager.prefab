@@ -48,6 +48,11 @@ MonoBehaviour:
   state: 0
   golfball: {fileID: 1513232015433331418, guid: 80d6514e4acc0f84182f2620365c5394, type: 3}
   moveBlocks: {fileID: 8035075126130301471}
+  spawnPoint: {fileID: 0}
+  hud: {fileID: 0}
+  startButton: {fileID: 0}
+  levelName: Level 1
+  par: 6
 --- !u!114 &8035075126130301471
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -52,12 +52,25 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        BeginBuild();
-        hud?.RefreshInGameHUD();
-        hud?.HideCompleteOverlay();
+        // Ensure HUD exists (in case it's spawned dynamically)
+        if (hud == null)
+            hud = FindFirstObjectByType<HUDManager>();
 
+        // Ensure RunScoreStore exists (in case level is loaded directly)
+        if (RunScoreStore.Instance == null)
+        {
+            var go = new GameObject("RunScoreStore");
+            go.AddComponent<RunScoreStore>();
+        }
+
+        BeginBuild();
+
+        // Now safe:
         int idx = SceneManager.GetActiveScene().buildIndex;
         RunScoreStore.Instance.RegisterLevelMeta(idx, levelName, par);
+
+        hud?.RefreshInGameHUD();
+        hud?.HideCompleteOverlay();
     }
 
     private void BeginBuild()
