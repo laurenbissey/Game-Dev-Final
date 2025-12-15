@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Golfball : MonoBehaviour
 {
@@ -107,7 +108,7 @@ public class Golfball : MonoBehaviour
         rb.AddForce(launchDirection * launchMultiplier, ForceMode2D.Impulse);
 
         // Count stroke
-        GameManager.Instance.RegisterStroke();
+        if(SceneManager.GetActiveScene().buildIndex != 0) GameManager.Instance.RegisterStroke();
         ballAudio.BallHit(launchDirection.magnitude);
 
         stopDelay = 0;
