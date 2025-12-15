@@ -400,6 +400,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnPos: {fileID: 7865060130958464440}
+  checkpointSound: {fileID: 8300000, guid: ea2cc5fe11316994599857fba796bc93, type: 3}
   transition: {fileID: 4183744048421269536}
 --- !u!1 &8657311076340271922
 GameObject:

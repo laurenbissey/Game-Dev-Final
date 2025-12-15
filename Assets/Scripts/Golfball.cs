@@ -5,6 +5,7 @@ public class Golfball : MonoBehaviour
     [Header("Components")]
     private Collider2D col;
     private Rigidbody2D rb;
+    private BallAudio ballAudio;
 
     public enum BallActivity { idle, active, aiming };
     [Header("Status")]
@@ -24,6 +25,7 @@ public class Golfball : MonoBehaviour
     {
         col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
+        ballAudio = GetComponent<BallAudio>();
 
         arrow.gameObject.SetActive(false);
     }
@@ -106,6 +108,7 @@ public class Golfball : MonoBehaviour
 
         // Count stroke
         GameManager.Instance.RegisterStroke();
+        ballAudio.BallHit(launchDirection.magnitude);
 
         stopDelay = 0;
         activity = BallActivity.active;

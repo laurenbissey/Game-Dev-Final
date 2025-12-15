@@ -27,6 +27,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private HUDManager hud;
     [SerializeField] private GameObject startButton;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip levelStartSound;
+
     [Header("Level Settings")]
     [SerializeField] private string levelName = "Level 1";
     [SerializeField] private int par = 6;
@@ -101,6 +104,8 @@ public class GameManager : MonoBehaviour
 
         BallManager.Instance.onRespawn.AddListener(BallDeath);
         BallManager.Instance.onLevelComplete.AddListener(OnLevelComplete);
+
+        AudioManager.instance.PlaySFX(levelStartSound, .75f);
 
         cameraFollow.target = golfBall.transform;
         cameraFollow.ResetView();

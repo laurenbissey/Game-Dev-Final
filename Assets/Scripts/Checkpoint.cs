@@ -10,6 +10,9 @@ public class Checkpoint : MonoBehaviour
 
     [SerializeField] private Transform respawnPos;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip checkpointSound;
+
     [Header("Visuals (optional)")]
     [SerializeField] private SpriteMaskTransition transition;
 
@@ -51,6 +54,8 @@ public class Checkpoint : MonoBehaviour
         if (cachedBall.activity == Golfball.BallActivity.idle && !isActivated)
         {
             cachedBallManager.SetCheckpoint(respawnPos.position);
+
+            AudioManager.instance.PlaySFX(checkpointSound, .75f);
             ActivateVisual();
         }
     }

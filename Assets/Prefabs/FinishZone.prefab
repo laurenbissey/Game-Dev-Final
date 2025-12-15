@@ -240,6 +240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   particles: {fileID: 2663415839725399114}
   particleLength: 3
+  victorySound: {fileID: 8300000, guid: e2d37b9018c41024984add6e76bac02f, type: 3}
   onBallEnterFinish:
     m_PersistentCalls:
       m_Calls: []

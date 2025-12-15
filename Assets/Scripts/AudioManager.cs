@@ -39,6 +39,7 @@ public class AudioManager : MonoBehaviour
         }
 
         activeSoundtrack = gameObject.AddComponent<AudioSource>();
+        activeSoundtrack.volume = .125f;
     }
 
     private void Start()
@@ -54,7 +55,7 @@ public class AudioManager : MonoBehaviour
     /// Call to add SFX to a pool of SFXs that are being played.
     /// </summary>
     /// <param name="clip">SFX clip that will be played.</param>
-    public void PlaySFX(AudioClip clip)
+    public void PlaySFX(AudioClip clip, float volume)
     {
         if (clip == null) return;
 
@@ -64,6 +65,7 @@ public class AudioManager : MonoBehaviour
             {
                 audioSource.clip = clip;
                 // audioSource.volume = SFXVolumePercentage;
+                audioSource.volume = volume;
                 audioSource.Play();
 
                 return;
@@ -72,6 +74,7 @@ public class AudioManager : MonoBehaviour
 
         sfxAudioSources[0].clip = clip;
         // sfxAudioSources[0].volume = SFXVolumePercentage;
+        sfxAudioSources[0].volume = volume;
         sfxAudioSources[0].Play();
     }
 

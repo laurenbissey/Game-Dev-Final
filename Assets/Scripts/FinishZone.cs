@@ -15,6 +15,9 @@ public class FinishZone : MonoBehaviour
     [SerializeField] private ParticleSystem particles;
     [SerializeField] private float particleLength = 3f;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip victorySound;
+
     [Header("Events")]
     public UnityEvent onBallEnterFinish;
 
@@ -62,6 +65,7 @@ public class FinishZone : MonoBehaviour
             cachedBallManager.LevelComplete();
             onBallEnterFinish?.Invoke();
 
+            AudioManager.instance.PlaySFX(victorySound, .25f);
             StartCoroutine(StartParticles());
         }
     }
