@@ -108,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   deadZoneSize: {x: 6, y: 4}
-  followSpeed: 5
+  followSpeed: 10
   followX: 1
   followY: 1
   onlyMoveUp: 0

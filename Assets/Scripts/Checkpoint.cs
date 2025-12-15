@@ -48,7 +48,7 @@ public class Checkpoint : MonoBehaviour
     {
         if (cachedBall == null || cachedBallManager == null) return;
 
-        if (cachedBall.activity == Golfball.BallActivity.idle)
+        if (cachedBall.activity == Golfball.BallActivity.idle && !isActivated)
         {
             cachedBallManager.SetCheckpoint(respawnPos.position);
             ActivateVisual();

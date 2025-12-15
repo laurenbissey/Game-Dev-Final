@@ -9,6 +9,8 @@ public class FinishZone : MonoBehaviour
     private BallManager cachedBallManager;
     private Golfball cachedBall;
 
+    private bool levelCompleted = false;
+
     [Header("Particles")]
     [SerializeField] private ParticleSystem particles;
     [SerializeField] private float particleLength = 3f;
@@ -53,8 +55,10 @@ public class FinishZone : MonoBehaviour
     {
         if (cachedBall == null || cachedBallManager == null) return;
 
-        if (cachedBall.activity == Golfball.BallActivity.idle)
+        if (cachedBall.activity == Golfball.BallActivity.idle && !levelCompleted)
         {
+            levelCompleted = true;
+
             cachedBallManager.LevelComplete();
             onBallEnterFinish?.Invoke();
 
