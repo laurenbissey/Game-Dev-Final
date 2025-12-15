@@ -52,6 +52,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 0}
   hud: {fileID: 0}
   startButton: {fileID: 0}
+  blockCanvas: {fileID: 0}
   levelStartSound: {fileID: 8300000, guid: 44baf6842a2fb61409600a66c1e6a7a8, type: 3}
   levelName: Level 1
   par: 6
@@ -67,6 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a2b8450a9abebb47856abc46747b74f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movingBlock: 0
 --- !u!114 &4779407122647975857
 MonoBehaviour:
   m_ObjectHideFlags: 0

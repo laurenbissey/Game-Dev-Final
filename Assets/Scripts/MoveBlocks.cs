@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MoveBlocks : MonoBehaviour
 {
-    private bool movingBlock = false;
+    public bool movingBlock = false;
 
     void Update()
     {

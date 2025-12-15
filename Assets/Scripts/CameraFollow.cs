@@ -63,7 +63,7 @@ public class CameraFollow : MonoBehaviour
         float halfDeadWidth = deadZoneSize.x * 0.5f;
         float halfDeadHeight = deadZoneSize.y * 0.5f;
 
-        Vector3 desiredPos = camPos;
+        Vector3 move = Vector3.zero;
 
         if (followX)
         {
@@ -71,17 +71,15 @@ public class CameraFollow : MonoBehaviour
 
             if (dx > halfDeadWidth)
             {
-                float newX = targetPos.x - halfDeadWidth;
-                if (!onlyMoveRight || newX > camPos.x)
-                    desiredPos.x = newX;
+                float newX = dx - halfDeadWidth;
+                if (!onlyMoveRight || newX > 0)
+                    move.x = newX;
             }
             else if (dx < -halfDeadWidth)
             {
-                float newX = targetPos.x + halfDeadWidth;
-                if (!onlyMoveRight || newX > camPos.x)
-                {
-                    desiredPos.x = newX;
-                }
+                float newX = dx + halfDeadWidth;
+                if (!onlyMoveRight || newX > 0)
+                    move.x = newX;
             }
         }
 
@@ -91,25 +89,26 @@ public class CameraFollow : MonoBehaviour
 
             if (dy > halfDeadHeight)
             {
-                float newY = targetPos.y - halfDeadHeight;
-                desiredPos.y = newY;
+                move.y = dy - halfDeadHeight;
             }
             else if (dy < -halfDeadHeight)
             {
-                float newY = targetPos.y + halfDeadHeight;
-                if (!onlyMoveUp || newY > camPos.y)
-                {
-                    desiredPos.y = newY;
-                }
+                float newY = dy + halfDeadHeight;
+                if (!onlyMoveUp || newY > 0)
+                    move.y = newY;
             }
         }
 
+        Vector3 desiredPos = camPos + move;
         desiredPos.z = initialZ;
+
         transform.position = Vector3.SmoothDamp(
-            camPos,
+            transform.position,
             desiredPos,
             ref velocity,
             1f / followSpeed
         );
+
     }
+
 }

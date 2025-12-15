@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     [Header("HUD")]
     [SerializeField] private HUDManager hud;
     [SerializeField] private GameObject startButton;
+    [SerializeField] private GameObject blockCanvas;
 
     [Header("SFX")]
     [SerializeField] private AudioClip levelStartSound;
@@ -109,6 +110,9 @@ public class GameManager : MonoBehaviour
 
         cameraFollow.target = golfBall.transform;
         cameraFollow.ResetView();
+
+        if (blockCanvas)
+            blockCanvas.SetActive(false);
 
         state = GameState.play;
     }

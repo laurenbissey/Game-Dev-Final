@@ -6,22 +6,29 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Movable : MonoBehaviour
 {
-    [Header("Components")]
     private Collider2D col;
     private Rigidbody2D rb;
 
-    private enum Activity { movable, moving, locked };
-    [Header("Status")]
-    [SerializeField] private Activity activity = Activity.movable;
+    public enum Activity { movable, moving, locked };
+    [SerializeField] public Activity activity = Activity.movable;
+
+    [SerializeField] private float gridSize = 1f;
+    [SerializeField] private Vector2 gridOrigin = Vector2.zero;
+
     private Vector2 offset = Vector2.zero;
     private Vector2 previousPos = Vector2.zero;
-    private bool isSeparated = true;
+    private Vector2 palettePos = Vector2.zero; 
+    
+    private RaycastHit2D[] hitResults = new RaycastHit2D[1];
+    private bool hasBeenSnapped = false; 
 
-    void Start()
+    void Awake()
     {
         col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
+
         rb.isKinematic = true;
+        palettePos = rb.position;
         previousPos = rb.position;
     }
 
@@ -36,90 +43,94 @@ public class Movable : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            if (!isSeparated)
+            if (IsMovementValid(Vector2.zero))
             {
-                rb.position = previousPos;
+                activity = Activity.movable;
             }
             else
             {
-                previousPos = rb.position;
+                rb.position = palettePos;
+                previousPos = palettePos;
+                hasBeenSnapped = false; 
+                activity = Activity.movable;
             }
-
-            activity = Activity.movable;
             return;
         }
 
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        rb.position = worldPos - offset;
+        Vector2 desiredPos = worldPos - offset;
+        Vector2 newPos = SnapToGrid(desiredPos);
 
-        PreventCollision();
-
-        if (isSeparated)
+        if (newPos != rb.position)
         {
-            previousPos = rb.position;
-        }
-        else
-        {
-            rb.position = previousPos;
+            Vector2 movementVector = newPos - rb.position;
+            
+            if (IsMovementValid(movementVector))
+            {
+                rb.position = newPos;
+                previousPos = newPos;
+            }
         }
     }
 
-    private void PreventCollision()
+    private Vector2 SnapToGrid(Vector2 pos)
     {
-        const int iterationCount = 10;
-        Collider2D[] overlapping = new Collider2D[16];
+        return new Vector2(
+            Mathf.Round((pos.x - gridOrigin.x) / gridSize) * gridSize + gridOrigin.x,
+            Mathf.Round((pos.y - gridOrigin.y) / gridSize) * gridSize + gridOrigin.y
+        );
+    }
+
+    private bool IsMovementValid(Vector2 movementVector)
+    {
+        float distance = movementVector.magnitude;
+        Vector2 direction = movementVector.normalized;
+
+        if (distance == 0f)
+        {
+            direction = Vector2.right; 
+            distance = 0.001f;
+        }
+
         ContactFilter2D filter = new ContactFilter2D().NoFilter();
+        filter.useTriggers = false;
 
-        int contactCount = rb.OverlapCollider(filter, overlapping);
+        int hitCount = rb.Cast(
+            direction,
+            filter,
+            hitResults,
+            distance
+        );
 
-        if (contactCount == 0)
+        for (int i = 0; i < hitCount; i++)
         {
-            isSeparated = true;
-            return;
-        }
-
-        for (int i = 0; i < iterationCount; i++)
-        {
-            isSeparated = true;
-
-            contactCount = rb.OverlapCollider(filter, overlapping);
-            if (contactCount == 0) break;
-
-            for (int j = 0; j < contactCount; j++)
+            RaycastHit2D hit = hitResults[i];
+            
+            if (hit.collider == col) continue; 
+            
+            if (hit.collider.CompareTag("Blocking") || !hit.collider.isTrigger)
             {
-                Collider2D overlap = overlapping[j];
-
-                if (overlap.isTrigger || overlap == col) continue;
-
-                if (overlap.CompareTag("Blocking"))
-                {
-                    isSeparated = false;
-                    activity = Activity.movable;
-                    return;
-                }
-
-                ColliderDistance2D colliderDistance = Physics2D.Distance(col, overlap);
-
-                if (colliderDistance.isOverlapped)
-                {
-                    Vector2 separation = colliderDistance.normal * colliderDistance.distance;
-                    rb.position += separation;
-                    isSeparated = false;
-                }
+                return false;
             }
-
-            if (isSeparated) break;
         }
+
+        return true;
     }
 
     public bool StartMoving()
     {
         if (activity == Activity.locked) return false;
 
+        if (!hasBeenSnapped)
+        {
+            rb.position = SnapToGrid(rb.position);
+            hasBeenSnapped = true;
+        }
+
         activity = Activity.moving;
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         offset = worldPos - rb.position;
-        previousPos = rb.position;
+        previousPos = rb.position; 
 
         return true;
     }
