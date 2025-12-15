@@ -104,6 +104,9 @@ public class Golfball : MonoBehaviour
 
         rb.AddForce(launchDirection * launchMultiplier, ForceMode2D.Impulse);
 
+        // Count stroke
+        GameManager.Instance.RegisterStroke();
+
         stopDelay = 0;
         activity = BallActivity.active;
     }

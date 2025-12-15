@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,6 +22,18 @@ public class GameManager : MonoBehaviour
     [Header("Spawning")]
     [SerializeField] private Transform spawnPoint;
 
+    [Header("HUD")]
+    [SerializeField] private HUDManager hud;
+    [SerializeField] private GameObject startButton;
+
+    [Header("Level Settings")]
+    [SerializeField] private string levelName = "Level 1";
+    [SerializeField] private int par = 6;
+
+    public int Strokes { get; private set; }
+    public int Par => par;
+    public string LevelName => levelName;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -38,6 +51,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         BeginBuild();
+        hud?.RefreshInGameHUD();
+        hud?.HideCompleteOverlay();
     }
 
     private void BeginBuild()
@@ -57,9 +72,17 @@ public class GameManager : MonoBehaviour
 
         cameraPan.enabled = false;
         cameraFollow.enabled = true;
+        startButton.gameObject.SetActive(false);
+
+        // Reset scoring for the level
+        Strokes = 0;
+        hud?.RefreshInGameHUD();
+
         GameObject golfBall = Instantiate(golfball);
         golfBall.GetComponent<BallManager>().SetInitialSpawnPoint(spawnPoint);
+
         BallManager.Instance.onRespawn.AddListener(BallDeath);
+        BallManager.Instance.onLevelComplete.AddListener(OnLevelComplete);
 
         cameraFollow.target = golfBall.transform;
         cameraFollow.ResetView();
@@ -67,9 +90,23 @@ public class GameManager : MonoBehaviour
         state = GameState.play;
     }
 
+    public void RegisterStroke()
+    {
+        if (state != GameState.play) return;
+
+        Strokes++;
+        hud?.RefreshInGameHUD();
+    }
+
     public void BeginComplete()
     {
         state = GameState.complete;
+    }
+
+    private void OnLevelComplete()
+    {
+        BeginComplete();
+        hud?.ShowCompleteOverlay();
     }
 
     public void BallDeath()
