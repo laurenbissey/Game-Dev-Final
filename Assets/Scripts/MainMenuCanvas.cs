@@ -9,6 +9,8 @@ public class MainMenuCanvas : MonoBehaviour
 
     public void PlayGame()
     {
+        RunScoreStore.Instance.ResetRun();
+
         SceneManager.LoadScene(level1);
     }
 

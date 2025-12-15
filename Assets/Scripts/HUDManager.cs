@@ -17,6 +17,9 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private TMP_Text completeParText;
     [SerializeField] private TMP_Text completeResultText;
 
+    [SerializeField] private int lastLevelBuildIndex = 3; // set in inspector
+    [SerializeField] private int endGameBuildIndex = 4;   // set in inspector
+
     private void Start()
     {
         // In-game HUD should always show
@@ -74,6 +77,18 @@ public class HUDManager : MonoBehaviour
 
     public void OnNextLevelPressed()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        int currentIndex = SceneManager.GetActiveScene().buildIndex;
+        int sceneCount = SceneManager.sceneCountInBuildSettings;
+
+        int lastPlayableIndex = sceneCount - 2;
+
+        if (currentIndex < lastPlayableIndex)
+        {
+            SceneManager.LoadScene(currentIndex + 1);
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneCount - 1);
+        }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviour
     public int Strokes { get; private set; }
     public int Par => par;
     public string LevelName => levelName;
+    private string LevelId => $"level_{SceneManager.GetActiveScene().buildIndex}";
 
     private void Awake()
     {
@@ -53,6 +55,9 @@ public class GameManager : MonoBehaviour
         BeginBuild();
         hud?.RefreshInGameHUD();
         hud?.HideCompleteOverlay();
+
+        int idx = SceneManager.GetActiveScene().buildIndex;
+        RunScoreStore.Instance.RegisterLevelMeta(idx, levelName, par);
     }
 
     private void BeginBuild()
@@ -106,6 +111,8 @@ public class GameManager : MonoBehaviour
     private void OnLevelComplete()
     {
         BeginComplete();
+        int idx = SceneManager.GetActiveScene().buildIndex;
+        RunScoreStore.Instance.TrySetBest(idx, Strokes);
         hud?.ShowCompleteOverlay();
     }
 
