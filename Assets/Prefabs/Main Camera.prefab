@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3285880649639974289}
   - component: {fileID: 8196436508000923060}
   - component: {fileID: 3481965632524027021}
+  - component: {fileID: 6580308640539432472}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -131,3 +132,18 @@ MonoBehaviour:
   widthClamp: {x: -11, y: 9}
   heightClamp: {x: -7, y: 7}
   clamped: 1
+--- !u!114 &6580308640539432472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7072065090980145487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54edbfc63f090ab4282007635a3e1cb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ballIdleMaxTime: 5
+  zoomScale: 1.5
+  zoomDuration: 2.5
