@@ -15,7 +15,7 @@ public class Golfball : MonoBehaviour
 
     [Header("Launch")]
     [SerializeField] private Arrow arrow;
-    [SerializeField] private float launchMultiplier = 1f;
+    [SerializeField] private float launchMultiplier = 2f;
     private float stopVelocity = .01f;
 
     [Tooltip("Gives time for the ball to accumulate velocity from idle.")]
@@ -99,7 +99,7 @@ public class Golfball : MonoBehaviour
         arrow.gameObject.SetActive(false);
 
         // Ensure the mouse is far enough off the ball to launch.
-        if (launchDirection.magnitude < 1f)
+        if (launchDirection.magnitude < .5f)
         {
             activity = BallActivity.idle;
             return;
