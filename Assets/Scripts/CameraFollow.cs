@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
@@ -26,6 +27,7 @@ public class CameraFollow : MonoBehaviour
     private Camera cam;
     private float initialZoom;
     private float initialZ;
+    private Vector3 velocity;
 
     void Awake()
     {
@@ -37,6 +39,18 @@ public class CameraFollow : MonoBehaviour
     private void OnEnable()
     {
         cam.orthographicSize = initialZoom;
+
+        ResetView();
+    }
+
+    public void ResetView()
+    {
+        if (target != null)
+            transform.position = new Vector3(
+                target.position.x,
+                target.position.y,
+                initialZ
+            );
     }
 
     void LateUpdate()
@@ -91,6 +105,11 @@ public class CameraFollow : MonoBehaviour
         }
 
         desiredPos.z = initialZ;
-        transform.position = Vector3.Lerp(camPos, desiredPos, followSpeed * Time.deltaTime);
+        transform.position = Vector3.SmoothDamp(
+            camPos,
+            desiredPos,
+            ref velocity,
+            1f / followSpeed
+        );
     }
 }

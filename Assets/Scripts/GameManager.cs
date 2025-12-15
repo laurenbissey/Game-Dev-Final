@@ -18,6 +18,9 @@ public class GameManager : MonoBehaviour
     private CameraFollow cameraFollow;
     private CameraPan cameraPan;
 
+    [Header("Spawning")]
+    [SerializeField] private Transform spawnPoint;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -55,8 +58,11 @@ public class GameManager : MonoBehaviour
         cameraPan.enabled = false;
         cameraFollow.enabled = true;
         GameObject golfBall = Instantiate(golfball);
+        golfBall.GetComponent<BallManager>().SetInitialSpawnPoint(spawnPoint);
+        BallManager.Instance.onRespawn.AddListener(BallDeath);
 
         cameraFollow.target = golfBall.transform;
+        cameraFollow.ResetView();
 
         state = GameState.play;
     }
@@ -64,5 +70,10 @@ public class GameManager : MonoBehaviour
     public void BeginComplete()
     {
         state = GameState.complete;
+    }
+
+    public void BallDeath()
+    {
+        cameraFollow.ResetView();
     }
 }

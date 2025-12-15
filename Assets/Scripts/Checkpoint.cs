@@ -8,10 +8,10 @@ public class Checkpoint : MonoBehaviour
     private BallManager cachedBallManager;
     private Golfball cachedBall;
 
+    [SerializeField] private Transform respawnPos;
+
     [Header("Visuals (optional)")]
-    [SerializeField] private SpriteRenderer flagRenderer;
-    [SerializeField] private Color inactiveColor = Color.white;
-    [SerializeField] private Color activeColor = Color.green;
+    [SerializeField] private SpriteMaskTransition transition;
 
     private bool isActivated = false;
 
@@ -21,17 +21,10 @@ public class Checkpoint : MonoBehaviour
         col.isTrigger = true;
     }
 
-    private void Start()
-    {
-        if (flagRenderer != null)
-        {
-            flagRenderer.color = inactiveColor;
-        }
-    }
-
     // Caches Golfball and BallManager scripts to prevent calling GetComponent each frame.
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (isActivated) return;
         if (other.attachedRigidbody == null) return;
 
         cachedBallManager = other.attachedRigidbody.GetComponent<BallManager>();
@@ -57,7 +50,7 @@ public class Checkpoint : MonoBehaviour
 
         if (cachedBall.activity == Golfball.BallActivity.idle)
         {
-            cachedBallManager.SetCheckpoint(transform.position);
+            cachedBallManager.SetCheckpoint(respawnPos.position);
             ActivateVisual();
         }
     }
@@ -67,9 +60,9 @@ public class Checkpoint : MonoBehaviour
         if (isActivated) return;
         isActivated = true;
 
-        if (flagRenderer != null)
+        if (transition != null)
         {
-            flagRenderer.color = activeColor;
+            transition.Reveal();
         }
     }
 }

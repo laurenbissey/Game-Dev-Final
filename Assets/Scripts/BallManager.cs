@@ -58,6 +58,15 @@ public class BallManager : MonoBehaviour
         Respawn();
     }
 
+    public void SetInitialSpawnPoint(Transform spawn)
+    {
+        initialSpawnPoint = spawn;
+        currentCheckpoint = spawn.position;
+
+        Respawn();
+    }
+
+
     /// Move ball back to checkpoint and stop its movement
     public void Respawn()
     {

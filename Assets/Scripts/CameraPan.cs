@@ -4,8 +4,13 @@ public class CameraPan : MonoBehaviour
 {
     [Header("Zoom Settings")]
     [SerializeField] private float zoomSpeed = 10f;
-    [SerializeField] private float minZoom = 5f;
-    [SerializeField] private float maxZoom = 50f;
+    [SerializeField] private float minZoom = 2.5f;
+    [SerializeField] private float maxZoom = 7.5f;
+
+    [Header("Max Screen")]
+    [SerializeField] private Vector2 widthClamp;
+    [SerializeField] private Vector2 heightClamp;
+    [SerializeField] private bool clamped = false;
 
     private Camera cam;
     private Vector3 lastMousePos;
@@ -19,6 +24,9 @@ public class CameraPan : MonoBehaviour
     {
         HandlePan();
         HandleZoom();
+
+        if (clamped)
+            ClampPosition();
     }
 
     void HandlePan()
@@ -43,17 +51,51 @@ public class CameraPan : MonoBehaviour
 
     void HandleZoom()
     {
-        // Scrollwheel to zoom.
         float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll == 0f)
+            return;
 
-        if (scroll != 0f)
-        {
-            float zoomAmount = -scroll * zoomSpeed;
-            float newSize = cam.orthographicSize + zoomAmount;
+        float targetSize = cam.orthographicSize - scroll * zoomSpeed;
 
-            newSize = Mathf.Clamp(newSize, minZoom, maxZoom);
+        targetSize = Mathf.Max(targetSize, minZoom);
 
-            cam.orthographicSize = newSize;
-        }
+        float maxAllowedZoom = GetMaxZoomAtPosition();
+        targetSize = Mathf.Min(targetSize, maxAllowedZoom);
+
+        cam.orthographicSize = targetSize;
+    }
+
+    float GetMaxZoomAtPosition()
+    {
+        Vector3 pos = transform.position;
+
+        float distLeft = pos.x - widthClamp.x;
+        float distRight = widthClamp.y - pos.x;
+        float distBottom = pos.y - heightClamp.x;
+        float distTop = heightClamp.y - pos.y;
+
+        float maxVert = Mathf.Min(distTop, distBottom);
+        float maxHorz = Mathf.Min(distLeft, distRight) / cam.aspect;
+
+        return Mathf.Min(maxVert, maxHorz, maxZoom);
+    }
+
+
+    void ClampPosition()
+    {
+        float camHeight = cam.orthographicSize;
+        float camWidth = camHeight * cam.aspect;
+
+        float minX = widthClamp.x + camWidth;
+        float maxX = widthClamp.y - camWidth;
+        float minY = heightClamp.x + camHeight;
+        float maxY = heightClamp.y - camHeight;
+
+        Vector3 pos = transform.position;
+
+        pos.x = Mathf.Clamp(pos.x, minX, maxX);
+        pos.y = Mathf.Clamp(pos.y, minY, maxY);
+
+        transform.position = pos;
     }
 }

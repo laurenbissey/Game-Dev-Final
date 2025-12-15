@@ -9,8 +9,17 @@ public class FinishZone : MonoBehaviour
     private BallManager cachedBallManager;
     private Golfball cachedBall;
 
+    [Header("Particles")]
+    [SerializeField] private ParticleSystem particles;
+    [SerializeField] private float particleLength = 3f;
+
     [Header("Events")]
     public UnityEvent onBallEnterFinish;
+
+    private void Awake()
+    {
+        particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+    }
 
     private void Reset()
     {
@@ -48,6 +57,18 @@ public class FinishZone : MonoBehaviour
         {
             cachedBallManager.LevelComplete();
             onBallEnterFinish?.Invoke();
+
+            StartCoroutine(StartParticles());
         }
+    }
+
+    IEnumerator StartParticles()
+    {
+        particles.Clear();
+        particles.Play();
+
+        yield return new WaitForSeconds(particleLength);
+
+        particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 }
