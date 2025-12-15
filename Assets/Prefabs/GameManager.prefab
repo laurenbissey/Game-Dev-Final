@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1608914381672961592}
   - component: {fileID: 2921807216496926382}
   - component: {fileID: 8035075126130301471}
-  - component: {fileID: 4576319730672178963}
+  - component: {fileID: 4779407122647975857}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -52,10 +52,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 0}
   hud: {fileID: 0}
   startButton: {fileID: 0}
-<<<<<<< Updated upstream
-=======
   levelStartSound: {fileID: 8300000, guid: 44baf6842a2fb61409600a66c1e6a7a8, type: 3}
->>>>>>> Stashed changes
   levelName: Level 1
   par: 6
 --- !u!114 &8035075126130301471
@@ -70,7 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a2b8450a9abebb47856abc46747b74f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4576319730672178963
+--- !u!114 &4779407122647975857
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
