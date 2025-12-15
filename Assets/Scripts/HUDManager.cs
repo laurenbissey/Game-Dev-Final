@@ -49,8 +49,8 @@ public class HUDManager : MonoBehaviour
         if (completeOverlay != null)
             completeOverlay.SetActive(true);
 
-        if (completeStrokesText != null) completeStrokesText.text = $"Strokes:\n{strokes}";
-        if (completeParText != null) completeParText.text = $"Par:\n{par}";
+        if (completeStrokesText != null) completeStrokesText.text = $"Strokes: {strokes}";
+        if (completeParText != null) completeParText.text = $"Par: {par}";
 
         int diff = strokes - par;
         string result = diff == 0 ? "Even par"
